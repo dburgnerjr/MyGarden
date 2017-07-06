@@ -39,7 +39,15 @@ class ViewController: UIViewController {
     }
 
     func appMovedToBackground() {
-        timer?.invalidate()
+        if (timerIsOn == true) {
+            timer?.invalidate()
+            let alertController = UIAlertController(title: "Sorry!", message:
+                "Your plant died on you.", preferredStyle: UIAlertControllerStyle.alert)
+            alertController.addAction(UIAlertAction(title: "OK", style:
+                UIAlertActionStyle.default, handler:nil))
+            present(alertController, animated: true, completion: nil)
+            timerIsOn = false
+        }
     }
     
     override func didReceiveMemoryWarning() {
@@ -58,6 +66,11 @@ class ViewController: UIViewController {
         if ((minutes == 0) && (seconds == 0)) {
             timer?.invalidate()
             timerIsOn = false
+            let alertController = UIAlertController(title: "Congratulations!", message:
+                "You get a cookie.", preferredStyle: UIAlertControllerStyle.alert)
+            alertController.addAction(UIAlertAction(title: "OK", style:
+                UIAlertActionStyle.default, handler:nil))
+            present(alertController, animated: true, completion: nil)
         }
     }
 
