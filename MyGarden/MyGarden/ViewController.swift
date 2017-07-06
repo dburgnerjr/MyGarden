@@ -11,7 +11,8 @@ import UIKit
 class ViewController: UIViewController {
 
     @IBOutlet var Label: UILabel!
-    var seconds = 60
+    var minutes = 5
+    var seconds = 00
     var timer : Timer?
     var timerIsOn = false
 
@@ -24,26 +25,40 @@ class ViewController: UIViewController {
     }
     @IBAction func stopButton(_ sender: Any) {
         timer?.invalidate()
-        seconds = 60
-        Label.text = "\(seconds)"
+        minutes = 5
+        seconds = 00
+        Label.text = String(format:"%i:%02i", minutes, seconds)
         timerIsOn = false
     }
     
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view, typically from a nib.
-
-        
+        let notificationCenter = NotificationCenter.default
+        notificationCenter.addObserver(self, selector: #selector(appMovedToBackground), name: Notification.Name.UIApplicationWillResignActive, object: nil)
     }
 
+    func appMovedToBackground() {
+        timer?.invalidate()
+    }
+    
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
         // Dispose of any resources that can be recreated.
     }
 
     func updateTime() {
-        seconds -= 1
-        Label.text = "\(seconds)"
+        if (seconds == 0) {
+            minutes -= 1
+            seconds = 59
+        } else {
+            seconds -= 1
+        }
+        Label.text = String(format:"%i:%02i", minutes, seconds)
+        if ((minutes == 0) && (seconds == 0)) {
+            timer?.invalidate()
+            timerIsOn = false
+        }
     }
 
 }
