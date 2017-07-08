@@ -11,11 +11,15 @@ import UIKit
 class ViewController: UIViewController {
 
     @IBOutlet var Label: UILabel!
-    var minutes = 5
+    var minutes = 0
     var seconds = 00
     var timer : Timer?
     var timerIsOn = false
+    var menuShowing = false
 
+    @IBOutlet var menuView: UIView!
+    @IBOutlet var leadingConstraint: NSLayoutConstraint!
+    
     @IBAction func startButton(_ sender: Any) {
         if (timerIsOn == false) {
             timer = Timer.scheduledTimer(timeInterval: 1, target: self, selector: (#selector(ViewController.updateTime)), userInfo: nil, repeats: true)
@@ -25,7 +29,7 @@ class ViewController: UIViewController {
     }
     @IBAction func stopButton(_ sender: Any) {
         timer?.invalidate()
-        minutes = 5
+        minutes = 0
         seconds = 00
         Label.text = String(format:"%i:%02i", minutes, seconds)
         timerIsOn = false
@@ -34,8 +38,38 @@ class ViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view, typically from a nib.
+        menuView.layer.shadowOpacity = 1
+        menuView.layer.shadowRadius = 5
         let notificationCenter = NotificationCenter.default
         notificationCenter.addObserver(self, selector: #selector(appMovedToBackground), name: Notification.Name.UIApplicationWillResignActive, object: nil)
+    }
+    
+    @IBAction func setTimerFiveMin(_ sender: Any) {
+        minutes = 5
+        seconds = 00
+        Label.text = String(format:"%i:%02i", minutes, seconds)
+        leadingConstraint.constant = -200
+        menuShowing = !menuShowing
+    }
+
+    @IBAction func setTimerTenMinutes(_ sender: Any) {
+        minutes = 10
+        seconds = 00
+        Label.text = String(format:"%i:%02i", minutes, seconds)
+        leadingConstraint.constant = -200
+        menuShowing = !menuShowing
+    }
+    
+    @IBAction func openMenu(_ sender: Any) {
+        if (menuShowing) {
+            leadingConstraint.constant = -200
+        } else {
+            leadingConstraint.constant = 0
+            UIView.animate(withDuration: 0.3, animations:{
+                self.view.layoutIfNeeded()
+            })
+        }
+        menuShowing = !menuShowing
     }
 
     func appMovedToBackground() {
@@ -56,21 +90,29 @@ class ViewController: UIViewController {
     }
 
     func updateTime() {
-        if (seconds == 0) {
-            minutes -= 1
-            seconds = 59
-        } else {
-            seconds -= 1
-        }
-        Label.text = String(format:"%i:%02i", minutes, seconds)
         if ((minutes == 0) && (seconds == 0)) {
-            timer?.invalidate()
-            timerIsOn = false
-            let alertController = UIAlertController(title: "Congratulations!", message:
-                "You get a cookie.", preferredStyle: UIAlertControllerStyle.alert)
+            let alertController = UIAlertController(title: "Timer is at 0:00", message:
+                "Please set your timer.", preferredStyle: UIAlertControllerStyle.alert)
             alertController.addAction(UIAlertAction(title: "OK", style:
                 UIAlertActionStyle.default, handler:nil))
             present(alertController, animated: true, completion: nil)
+        } else {
+            if (seconds == 0) {
+                minutes -= 1
+                seconds = 59
+            } else {
+                seconds -= 1
+            }
+            Label.text = String(format:"%i:%02i", minutes, seconds)
+            if ((minutes == 0) && (seconds == 0)) {
+                timer?.invalidate()
+                timerIsOn = false
+                let alertController = UIAlertController(title: "Congratulations!", message:
+                    "You can harvest your plant.", preferredStyle: UIAlertControllerStyle.alert)
+                alertController.addAction(UIAlertAction(title: "OK", style:
+                    UIAlertActionStyle.default, handler:nil))
+                present(alertController, animated: true, completion: nil)
+            }
         }
     }
 
