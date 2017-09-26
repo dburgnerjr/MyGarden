@@ -15,16 +15,28 @@ class ViewController: UIViewController {
     var seconds = 00
     var timer : Timer?
     var timerIsOn = false
+    var plantDied = false
     var menuShowing = false
 
     @IBOutlet var menuView: UIView!
     @IBOutlet var leadingConstraint: NSLayoutConstraint!
     
     @IBAction func startButton(_ sender: Any) {
-        if (timerIsOn == false) {
+        if (plantDied == true) {
+            let alertController = UIAlertController(title: "Sorry!", message:
+                "Please reset your timer.", preferredStyle: UIAlertControllerStyle.alert)
+            alertController.addAction(UIAlertAction(title: "OK", style:
+                UIAlertActionStyle.default, handler:nil))
+            present(alertController, animated: true, completion: nil)
+        } else if ((timerIsOn == false) && ((minutes == 0) && (seconds == 0))) {
+            let alertController = UIAlertController(title: "Timer is at 0:00", message:
+                "Please set your timer.", preferredStyle: UIAlertControllerStyle.alert)
+            alertController.addAction(UIAlertAction(title: "OK", style:
+                UIAlertActionStyle.default, handler:nil))
+            present(alertController, animated: true, completion: nil)
+        } else if (timerIsOn == false) {
             timer = Timer.scheduledTimer(timeInterval: 1, target: self, selector: (#selector(ViewController.updateTime)), userInfo: nil, repeats: true)
             timerIsOn = true
-            
         }
     }
     @IBAction func stopButton(_ sender: Any) {
@@ -81,6 +93,7 @@ class ViewController: UIViewController {
                 UIAlertActionStyle.default, handler:nil))
             present(alertController, animated: true, completion: nil)
             timerIsOn = false
+            plantDied = true
         }
     }
     
@@ -90,29 +103,21 @@ class ViewController: UIViewController {
     }
 
     func updateTime() {
+        if (seconds == 0) {
+            minutes -= 1
+            seconds = 59
+        } else {
+            seconds -= 1
+        }
+        Label.text = String(format:"%i:%02i", minutes, seconds)
         if ((minutes == 0) && (seconds == 0)) {
-            let alertController = UIAlertController(title: "Timer is at 0:00", message:
-                "Please set your timer.", preferredStyle: UIAlertControllerStyle.alert)
+            timer?.invalidate()
+            timerIsOn = false
+            let alertController = UIAlertController(title: "Congratulations!", message:
+                "You can harvest your plant.", preferredStyle: UIAlertControllerStyle.alert)
             alertController.addAction(UIAlertAction(title: "OK", style:
                 UIAlertActionStyle.default, handler:nil))
             present(alertController, animated: true, completion: nil)
-        } else {
-            if (seconds == 0) {
-                minutes -= 1
-                seconds = 59
-            } else {
-                seconds -= 1
-            }
-            Label.text = String(format:"%i:%02i", minutes, seconds)
-            if ((minutes == 0) && (seconds == 0)) {
-                timer?.invalidate()
-                timerIsOn = false
-                let alertController = UIAlertController(title: "Congratulations!", message:
-                    "You can harvest your plant.", preferredStyle: UIAlertControllerStyle.alert)
-                alertController.addAction(UIAlertAction(title: "OK", style:
-                    UIAlertActionStyle.default, handler:nil))
-                present(alertController, animated: true, completion: nil)
-            }
         }
     }
 
