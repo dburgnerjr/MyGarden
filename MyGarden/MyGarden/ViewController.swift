@@ -17,7 +17,10 @@ class ViewController: UIViewController {
     var timerIsOn = false
     var plantDied = false
     var menuShowing = false
+    var harvestPlant = false
 
+    @IBOutlet weak var startButton: UIButton!
+    @IBOutlet weak var stopButton: UIButton!
     @IBOutlet var menuView: UIView!
     @IBOutlet var leadingConstraint: NSLayoutConstraint!
     
@@ -37,6 +40,8 @@ class ViewController: UIViewController {
         } else if (timerIsOn == false) {
             timer = Timer.scheduledTimer(timeInterval: 1, target: self, selector: (#selector(ViewController.updateTime)), userInfo: nil, repeats: true)
             timerIsOn = true
+            startButton.isHidden = true
+            stopButton.isHidden = false
         }
     }
     @IBAction func stopButton(_ sender: Any) {
@@ -45,6 +50,14 @@ class ViewController: UIViewController {
         seconds = 00
         Label.text = String(format:"%i:%02i", minutes, seconds)
         timerIsOn = false
+        startButton.isHidden = false
+        stopButton.isHidden = true
+        if (plantDied == true) {
+            plantDied = false
+        }
+        if (harvestPlant == true) {
+            harvestPlant = false
+        }
     }
     
     override func viewDidLoad() {
@@ -54,8 +67,18 @@ class ViewController: UIViewController {
         menuView.layer.shadowRadius = 5
         let notificationCenter = NotificationCenter.default
         notificationCenter.addObserver(self, selector: #selector(appMovedToBackground), name: Notification.Name.UIApplicationWillResignActive, object: nil)
+        startButton.isHidden = false
+        stopButton.isHidden = true
     }
     
+    @IBAction func setTimerOneMin(_ sender: Any) {
+        minutes = 1
+        seconds = 00
+        Label.text = String(format:"%i:%02i", minutes, seconds)
+        leadingConstraint.constant = -200
+        menuShowing = !menuShowing
+    }
+
     @IBAction func setTimerFiveMin(_ sender: Any) {
         minutes = 5
         seconds = 00
@@ -94,6 +117,7 @@ class ViewController: UIViewController {
             present(alertController, animated: true, completion: nil)
             timerIsOn = false
             plantDied = true
+            stopButton.isHidden = false
         }
     }
     
@@ -118,6 +142,7 @@ class ViewController: UIViewController {
             alertController.addAction(UIAlertAction(title: "OK", style:
                 UIAlertActionStyle.default, handler:nil))
             present(alertController, animated: true, completion: nil)
+            harvestPlant = true
         }
     }
 
